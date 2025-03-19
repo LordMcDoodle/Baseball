@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ThrowForceBar.generated.h"
 
+class UProgressBar;
 /**
  * 
  */
@@ -13,5 +14,8 @@ UCLASS()
 class BASEBALL_API UThrowForceBar : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* ThrowForceBar;
 };

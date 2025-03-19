@@ -13,6 +13,13 @@ public:
 	AThrower();
 
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(VisibleAnywhere)
+	//Properties
+	float ThrowForce;
+
+
+	void ThrowBall();
 protected:
 	virtual void BeginPlay() override;
 	
@@ -30,7 +37,6 @@ protected:
 	Functions
 	*/
 
-	void ThrowBall();
 	void CreateField();
 
 	/*

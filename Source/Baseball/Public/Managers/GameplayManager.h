@@ -11,7 +11,8 @@ class AThrower;
 class ABatter;
 class UInputMappingContext;
 class UInputAction;
-class UThrowForceBar;
+class USceneComponent;
+class UHUDWidget;
 
 UCLASS()
 class BASEBALL_API AGameplayManager : public APawn
@@ -26,8 +27,6 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//HUD
-	UThrowForceBar* ThrowForceBar;
 
 	//Entities
 	UPROPERTY(EditAnywhere, Category = Entities)
@@ -44,18 +43,32 @@ public:
 	UInputAction* SwingBatAction;
 	UPROPERTY(EditDefaultsOnly, Category = Input)
 	UInputAction* ThrowBallAction;
+	UPROPERTY(EditDefaultsOnly, Category = Input)
+	UInputAction* DetermineThrowForceAction;
+	UPROPERTY(EditDefaultsOnly, Category = Input)
+	UInputAction* DetermineSwingForceAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = HUD)
+	UHUDWidget* HUDWidget;
 
 
 	//Input Callbacks
 	void MoveBat(const FInputActionValue& Value);
 	void ThrowBall(const FInputActionValue& Value);
 	void SwingBat(const FInputActionValue& Value);
+	void DetermineThrowForce(const FInputActionValue& Value);
+	void DetermineSwingForce(const FInputActionValue& Value);
 
 protected:
 	virtual void BeginPlay() override;
 
-	//Functions
-	float DetermineForce(float minForce, float maxForce);
+	//Bools
+	bool bIsCalculatingThrowForce = false;
+	bool bIsCalculatingSwingForce = false;
 
+	//Properties
 
+	//These time properties are used to change the ThrowForceBar and SwingForceBar
+	float ThrowForceBarRunningTime = 0.f;
+	float SwingForceBarRunningTime = 0.f;
 };

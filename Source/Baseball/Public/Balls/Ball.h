@@ -14,15 +14,14 @@ class BASEBALL_API ABall : public AActor
 	
 public:	
 	ABall();
-
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* mesh;
 	virtual void Tick(float DeltaTime) override;
 
 protected:
 
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* mesh;
 	UPROPERTY(EditAnywhere)
 	UCapsuleComponent* capsule;
 

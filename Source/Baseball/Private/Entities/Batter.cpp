@@ -28,7 +28,8 @@ void ABatter::Tick(float DeltaTime)
 void ABatter::CreateFields()
 {
 	FVector Location = GetActorLocation() + (GetActorForwardVector() * 20.f);
-	GetWorld()->SpawnActor<ABatterFieldSystem>(BatterFieldSystemClass, Location, GetActorRotation());
+	ABatterFieldSystem* Fields = GetWorld()->SpawnActor<ABatterFieldSystem>(BatterFieldSystemClass, Location, GetActorRotation());
+	Fields->Force = SwingForce;
 }
 
 

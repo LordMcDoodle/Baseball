@@ -27,15 +27,21 @@ void AThrower::Tick(float DeltaTime)
 void AThrower::ThrowBall()
 {
 	FVector Location = GetActorLocation() + (GetActorForwardVector() * 50.f);
-	GetWorld()->SpawnActor<ABall>(BallClass, Location, GetActorRotation());
+	ABall* Ball = GetWorld()->SpawnActor<ABall>(BallClass, Location, GetActorRotation());
 
-	CreateField();
+	Ball->mesh->AddImpulse(FVector(-(ThrowForce*1000),0,0),NAME_None,true);
+
+	//CreateField();
 }
 
 void AThrower::CreateField()
 {
 	FVector Location = GetActorLocation() + (GetActorForwardVector() * 20.f);
-	GetWorld()->SpawnActor<AThrowerFieldSystem>(ThrowerFieldSystemClass, Location, GetActorRotation());
+	AThrowerFieldSystem* Field = GetWorld()->SpawnActorDeferred<AThrowerFieldSystem>(AThrowerFieldSystem::StaticClass(), GetTransform());
+	Field->Force = ThrowForce;
+	Field->FinishSpawning(GetTransform());
+
+	Field->CreateForce();
 }
 
 

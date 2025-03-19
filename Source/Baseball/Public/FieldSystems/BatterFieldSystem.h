@@ -13,5 +13,8 @@ UCLASS()
 class BASEBALL_API ABatterFieldSystem : public AFieldSystemActor
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	float Force;
 };

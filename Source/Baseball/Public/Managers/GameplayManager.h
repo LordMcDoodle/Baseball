@@ -13,6 +13,8 @@ class UInputMappingContext;
 class UInputAction;
 class USceneComponent;
 class UHUDWidget;
+class APlayerController;
+class ATargetWidget;
 
 UCLASS()
 class BASEBALL_API AGameplayManager : public APawn
@@ -33,6 +35,8 @@ public:
 	ABatter* batter;
 	UPROPERTY(EditAnywhere, Category = Entities)
 	AThrower* thrower;
+	UPROPERTY(EditAnywhere, Category = Entities)
+	ATargetWidget* TargetWidget;
 
 	//Input Mapping Contexts
 	UPROPERTY(EditDefaultsOnly, Category = Input)
@@ -47,6 +51,10 @@ public:
 	UInputAction* DetermineThrowForceAction;
 	UPROPERTY(EditDefaultsOnly, Category = Input)
 	UInputAction* DetermineSwingForceAction;
+	UPROPERTY(EditDefaultsOnly, Category = Input)
+	UInputAction* AimAction;
+	UPROPERTY(EditDefaultsOnly, Category = Input)
+	UInputAction* ConfirmTargetAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = HUD)
 	UHUDWidget* HUDWidget;
@@ -58,6 +66,8 @@ public:
 	void SwingBat(const FInputActionValue& Value);
 	void DetermineThrowForce(const FInputActionValue& Value);
 	void DetermineSwingForce(const FInputActionValue& Value);
+	void TakeAim(const FInputActionValue&);
+	void ConfirmTarget(const FInputActionValue&);
 
 protected:
 	virtual void BeginPlay() override;
@@ -65,8 +75,10 @@ protected:
 	//Bools
 	bool bIsCalculatingThrowForce = false;
 	bool bIsCalculatingSwingForce = false;
+	bool bTargetIsLocked = false;
 
 	//Properties
+	APlayerController* PlayerController;
 
 	//These time properties are used to change the ThrowForceBar and SwingForceBar
 	float ThrowForceBarRunningTime = 0.f;

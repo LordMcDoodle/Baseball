@@ -2,6 +2,7 @@
 #include "Managers/GameplayManager.h"
 #include "Entities/Batter.h"
 #include "Entities/Thrower.h"
+#include "Entities/TargetWidget.h"
 #include "Components/InputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
@@ -18,13 +19,15 @@ AGameplayManager::AGameplayManager()
 	//HUDWidget = CreateDefaultSubobject<UHUDWidget>(TEXT("HUD Widget"));
 
 	UWorld* TheWorld = GetWorld();
+
 }
 
 void AGameplayManager::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay(); 
+	PlayerController = Cast<APlayerController>(GetController());
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	if (PlayerController)
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
@@ -94,6 +97,26 @@ void AGameplayManager::DetermineSwingForce(const FInputActionValue& Value)
 
 }
 
+void AGameplayManager::TakeAim(const FInputActionValue&)
+{
+	if(!bTargetIsLocked)
+	{
+		FHitResult Hit;
+		PlayerController->GetHitResultUnderCursor(ECC_WorldStatic, true, Hit);
+
+		if (TargetWidget)
+		{
+			TargetWidget->SetActorLocation(Hit.Location);
+		}
+
+	}
+}
+
+void AGameplayManager::ConfirmTarget(const FInputActionValue&)
+{
+	bTargetIsLocked = true;
+}
+
 void AGameplayManager::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -105,6 +128,9 @@ void AGameplayManager::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(ThrowBallAction, ETriggerEvent::Triggered, this, &AGameplayManager::ThrowBall);
 		EnhancedInputComponent->BindAction(DetermineThrowForceAction, ETriggerEvent::Triggered, this, &AGameplayManager::DetermineThrowForce);
 		EnhancedInputComponent->BindAction(DetermineSwingForceAction, ETriggerEvent::Triggered, this, &AGameplayManager::DetermineSwingForce);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AGameplayManager::TakeAim);
+		EnhancedInputComponent->BindAction(ConfirmTargetAction, ETriggerEvent::Triggered, this, &AGameplayManager::ConfirmTarget);
+		
 	}
 }
 

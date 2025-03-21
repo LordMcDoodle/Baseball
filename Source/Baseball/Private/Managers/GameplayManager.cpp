@@ -10,7 +10,7 @@
 #include "GameFramework/GameMode.h"
 #include "HUD/HUDWidget.h"
 #include "HUD/ThrowForceBar.h"
-
+#include "Balls/Ball.h"
 
 AGameplayManager::AGameplayManager()
 {
@@ -65,12 +65,15 @@ void AGameplayManager::MoveBat(const FInputActionValue& Value)
 
 void AGameplayManager::ThrowBall(const FInputActionValue& Value)
 {
-	thrower->ThrowBall();
+	Ball = thrower->ThrowBall();
 }
 
 void AGameplayManager::SwingBat(const FInputActionValue& Value)
 {
-	batter->SwingBat();
+	if(Ball)
+	{
+		batter->SwingBat(BatToTargetVector, Ball);
+	}
 }
 
 void AGameplayManager::DetermineThrowForce(const FInputActionValue& Value)
@@ -115,6 +118,11 @@ void AGameplayManager::TakeAim(const FInputActionValue&)
 void AGameplayManager::ConfirmTarget(const FInputActionValue&)
 {
 	bTargetIsLocked = true;
+
+	FVector TargetVector = TargetWidget->GetActorLocation();
+	FVector BatVector = batter->GetActorLocation();
+
+	BatToTargetVector = FVector(TargetVector.X - BatVector.X, TargetVector.Y - BatVector.Y, TargetVector.Z - BatVector.Z);
 }
 
 void AGameplayManager::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

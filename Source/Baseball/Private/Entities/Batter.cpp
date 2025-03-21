@@ -1,6 +1,7 @@
 
 #include "Entities/Batter.h"
 #include "FieldSystems/BatterFieldSystem.h"
+#include "Balls/Ball.h"
 
 ABatter::ABatter()
 {
@@ -8,9 +9,11 @@ ABatter::ABatter()
 
 }
 
-void ABatter::SwingBat()
+void ABatter::SwingBat(FVector BatToTargetVector, ABall* ball)
 {
-	CreateFields();
+	ball->mesh->AddImpulse(BatToTargetVector*(SwingForce*2), NAME_None, true);
+
+	//CreateFields();
 }
 
 void ABatter::BeginPlay()

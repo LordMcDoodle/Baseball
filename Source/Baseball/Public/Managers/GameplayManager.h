@@ -15,6 +15,7 @@ class USceneComponent;
 class UHUDWidget;
 class APlayerController;
 class ATargetWidget;
+class ABall;
 
 UCLASS()
 class BASEBALL_API AGameplayManager : public APawn
@@ -37,6 +38,8 @@ public:
 	AThrower* thrower;
 	UPROPERTY(EditAnywhere, Category = Entities)
 	ATargetWidget* TargetWidget;
+	UPROPERTY()
+	ABall* Ball = nullptr;
 
 	//Input Mapping Contexts
 	UPROPERTY(EditDefaultsOnly, Category = Input)
@@ -68,6 +71,8 @@ public:
 	void DetermineSwingForce(const FInputActionValue& Value);
 	void TakeAim(const FInputActionValue&);
 	void ConfirmTarget(const FInputActionValue&);
+
+	FVector BatToTargetVector = FVector::Zero();
 
 protected:
 	virtual void BeginPlay() override;

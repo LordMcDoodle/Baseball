@@ -4,6 +4,8 @@
 #include "GameFramework/Actor.h"
 #include "Thrower.generated.h"
 
+class ABall;
+
 UCLASS()
 class BASEBALL_API AThrower : public AActor
 {
@@ -19,7 +21,7 @@ public:
 	float ThrowForce;
 
 
-	void ThrowBall();
+	ABall* ThrowBall();
 protected:
 	virtual void BeginPlay() override;
 	

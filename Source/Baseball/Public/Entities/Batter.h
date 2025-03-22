@@ -5,6 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "Batter.generated.h"
 
+class ABall;
+
 UCLASS()
 class BASEBALL_API ABatter : public AActor
 {
@@ -17,7 +19,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	//Functions
-	void SwingBat();
+	void SwingBat(FVector BatToTargetVector, ABall* ball);
 
 	UPROPERTY(VisibleAnywhere)
 	float SwingForce;

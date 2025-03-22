@@ -2,6 +2,7 @@
 #include "Entities/Thrower.h"
 #include "Balls/Ball.h"
 #include "FieldSystems/ThrowerFieldSystem.h"
+#include "Balls/Ball.h"
 
 AThrower::AThrower()
 {
@@ -14,8 +15,6 @@ AThrower::AThrower()
 void AThrower::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	GetWorldTimerManager().SetTimer(ThrowTimer,this,&AThrower::ThrowBall,10.f);
 }
 
 
@@ -24,13 +23,14 @@ void AThrower::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AThrower::ThrowBall()
+ABall* AThrower::ThrowBall()
 {
 	FVector Location = GetActorLocation() + (GetActorForwardVector() * 50.f);
 	ABall* Ball = GetWorld()->SpawnActor<ABall>(BallClass, Location, GetActorRotation());
 
 	Ball->mesh->AddImpulse(FVector(-(ThrowForce*1000),0,0),NAME_None,true);
 
+	return Ball;
 	//CreateField();
 }
 

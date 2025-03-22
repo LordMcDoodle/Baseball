@@ -75,7 +75,10 @@ public:
 	FVector BatToTargetVector = FVector::Zero();
 
 protected:
+	//Functions
 	virtual void BeginPlay() override;
+	virtual void SlowmoFrame();
+	virtual void ResetWorldTimeDilation();
 
 	//Bools
 	bool bIsCalculatingThrowForce = false;
@@ -84,8 +87,10 @@ protected:
 
 	//Properties
 	APlayerController* PlayerController;
+	FTimerHandle SlowmoTimer;
 
 	//These time properties are used to change the ThrowForceBar and SwingForceBar
 	float ThrowForceBarRunningTime = 0.f;
 	float SwingForceBarRunningTime = 0.f;
+
 };

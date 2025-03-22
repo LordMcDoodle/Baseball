@@ -36,6 +36,17 @@ void AGameplayManager::BeginPlay()
 	}
 }
 
+void AGameplayManager::SlowmoFrame()
+{
+	GetWorldSettings()->SetTimeDilation(0.01f);
+	GetWorldTimerManager().SetTimer(SlowmoTimer, this, &AGameplayManager::ResetWorldTimeDilation, 0.003f);
+}
+
+void AGameplayManager::ResetWorldTimeDilation()
+{
+	GetWorldSettings()->SetTimeDilation(1.f);
+}
+
 void AGameplayManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -73,6 +84,8 @@ void AGameplayManager::SwingBat(const FInputActionValue& Value)
 	if(Ball)
 	{
 		batter->SwingBat(BatToTargetVector, Ball);
+		SlowmoFrame();
+		//GetWorldTimerManager().ClearTimer(SlowmoTimer);
 	}
 }
 

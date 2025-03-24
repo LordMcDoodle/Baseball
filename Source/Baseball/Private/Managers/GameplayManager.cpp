@@ -11,6 +11,7 @@
 #include "HUD/HUDWidget.h"
 #include "HUD/ThrowForceBar.h"
 #include "Balls/Ball.h"
+#include "Camera/CameraComponent.h"
 
 AGameplayManager::AGameplayManager()
 {
@@ -20,11 +21,13 @@ AGameplayManager::AGameplayManager()
 
 	UWorld* TheWorld = GetWorld();
 
+	BaseCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Base Camera"));
 }
 
 void AGameplayManager::BeginPlay()
 {
 	Super::BeginPlay(); 
+	BaseCamera->SetActive(true);
 	PlayerController = Cast<APlayerController>(GetController());
 
 	if (PlayerController)
@@ -45,6 +48,18 @@ void AGameplayManager::SlowmoFrame()
 void AGameplayManager::ResetWorldTimeDilation()
 {
 	GetWorldSettings()->SetTimeDilation(1.f);
+}
+
+void AGameplayManager::FollowBall(bool active)
+{
+	if(active)
+	{
+		PlayerController->SetViewTarget(Ball);
+	}
+	else
+	{
+		PlayerController->SetViewTarget(this);
+	}
 }
 
 void AGameplayManager::Tick(float DeltaTime)
@@ -86,6 +101,7 @@ void AGameplayManager::SwingBat(const FInputActionValue& Value)
 		batter->SwingBat(BatToTargetVector, Ball);
 		SlowmoFrame();
 		//GetWorldTimerManager().ClearTimer(SlowmoTimer);
+		FollowBall(true);
 	}
 }
 

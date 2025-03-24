@@ -16,6 +16,7 @@ class UHUDWidget;
 class APlayerController;
 class ATargetWidget;
 class ABall;
+class UCameraComponent;
 
 UCLASS()
 class BASEBALL_API AGameplayManager : public APawn
@@ -59,8 +60,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Input)
 	UInputAction* ConfirmTargetAction;
 
+	//Components
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = HUD)
 	UHUDWidget* HUDWidget;
+	UPROPERTY(EditAnywhere, Category = Cameras)
+	UCameraComponent* BaseCamera;
+
 
 
 	//Input Callbacks
@@ -79,6 +84,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SlowmoFrame();
 	virtual void ResetWorldTimeDilation();
+	virtual void FollowBall(bool active);
 
 	//Bools
 	bool bIsCalculatingThrowForce = false;

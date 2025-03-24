@@ -6,6 +6,8 @@
 #include "Ball.generated.h"
 
 class UCapsuleComponent;
+class UCameraComponent;
+class USpringArmComponent;
 
 UCLASS()
 class BASEBALL_API ABall : public AActor
@@ -16,6 +18,11 @@ public:
 	ABall();
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* mesh;
+	UPROPERTY(EditDefaultsOnly)
+	UCameraComponent* FollowCamera;
+	UPROPERTY(EditDefaultsOnly)
+	USpringArmComponent* SpringArm;
+
 	virtual void Tick(float DeltaTime) override;
 
 protected:

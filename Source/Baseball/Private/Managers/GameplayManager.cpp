@@ -22,6 +22,7 @@ AGameplayManager::AGameplayManager()
 	UWorld* TheWorld = GetWorld();
 
 	BaseCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Base Camera"));
+	HitCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Hit Camera"));
 }
 
 void AGameplayManager::BeginPlay()
@@ -48,6 +49,12 @@ void AGameplayManager::SlowmoFrame()
 void AGameplayManager::ResetWorldTimeDilation()
 {
 	GetWorldSettings()->SetTimeDilation(1.f);
+}
+
+void AGameplayManager::ResetToBaseCamera()
+{
+	HitCamera->SetActive(false);
+	BaseCamera->SetActive(true);
 }
 
 void AGameplayManager::FollowBall(bool active)
@@ -86,7 +93,7 @@ void AGameplayManager::Tick(float DeltaTime)
 }
 
 void AGameplayManager::MoveBat(const FInputActionValue& Value)
-{
+{	
 }
 
 void AGameplayManager::ThrowBall(const FInputActionValue& Value)
@@ -155,6 +162,11 @@ void AGameplayManager::ConfirmTarget(const FInputActionValue&)
 	BatToTargetVector = FVector(TargetVector.X - BatVector.X, TargetVector.Y - BatVector.Y, TargetVector.Z - BatVector.Z);
 }
 
+void AGameplayManager::ResetTarget(const FInputActionValue&)
+{
+	bTargetIsLocked = false;
+}
+
 void AGameplayManager::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -168,6 +180,7 @@ void AGameplayManager::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(DetermineSwingForceAction, ETriggerEvent::Triggered, this, &AGameplayManager::DetermineSwingForce);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AGameplayManager::TakeAim);
 		EnhancedInputComponent->BindAction(ConfirmTargetAction, ETriggerEvent::Triggered, this, &AGameplayManager::ConfirmTarget);
+		EnhancedInputComponent->BindAction(ResetTargetAction, ETriggerEvent::Triggered, this, &AGameplayManager::ResetTarget);
 		
 	}
 }
@@ -176,5 +189,9 @@ void AGameplayManager::BallHitTarget()
 {
 	SlowmoFrame();
 	FollowBall(false);
+	HitCamera->SetRelativeTransform(Ball->FollowCamera->GetComponentTransform());
+	BaseCamera->SetActive(false);
+	HitCamera->SetActive(true);
+	GetWorldTimerManager().SetTimer(HitCameraTimer, this, &AGameplayManager::ResetToBaseCamera, 2.f);
 }
 

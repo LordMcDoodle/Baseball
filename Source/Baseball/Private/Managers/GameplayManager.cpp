@@ -92,6 +92,7 @@ void AGameplayManager::MoveBat(const FInputActionValue& Value)
 void AGameplayManager::ThrowBall(const FInputActionValue& Value)
 {
 	Ball = thrower->ThrowBall();
+	Ball->SetGameplayManager(this);
 }
 
 void AGameplayManager::SwingBat(const FInputActionValue& Value)
@@ -169,5 +170,11 @@ void AGameplayManager::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(ConfirmTargetAction, ETriggerEvent::Triggered, this, &AGameplayManager::ConfirmTarget);
 		
 	}
+}
+
+void AGameplayManager::BallHitTarget()
+{
+	SlowmoFrame();
+	FollowBall(false);
 }
 

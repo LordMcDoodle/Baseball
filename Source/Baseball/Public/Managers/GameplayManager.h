@@ -31,6 +31,8 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void BallHitTarget();
+
 
 	//Entities
 	UPROPERTY(EditAnywhere, Category = Entities)

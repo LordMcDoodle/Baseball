@@ -16,6 +16,7 @@ class UHUDWidget;
 class APlayerController;
 class ATargetWidget;
 class ABall;
+class UCameraComponent;
 
 UCLASS()
 class BASEBALL_API AGameplayManager : public APawn
@@ -29,6 +30,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void BallHitTarget();
 
 
 	//Entities
@@ -58,9 +61,17 @@ public:
 	UInputAction* AimAction;
 	UPROPERTY(EditDefaultsOnly, Category = Input)
 	UInputAction* ConfirmTargetAction;
+	UPROPERTY(EditDefaultsOnly, Category = Input)
+	UInputAction* ResetTargetAction;
 
+	//Components
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = HUD)
 	UHUDWidget* HUDWidget;
+	UPROPERTY(EditAnywhere, Category = Cameras)
+	UCameraComponent* BaseCamera;
+	UPROPERTY(EditAnywhere, Category = Cameras)
+	UCameraComponent* HitCamera;
+
 
 
 	//Input Callbacks
@@ -71,11 +82,17 @@ public:
 	void DetermineSwingForce(const FInputActionValue& Value);
 	void TakeAim(const FInputActionValue&);
 	void ConfirmTarget(const FInputActionValue&);
+	void ResetTarget(const FInputActionValue&);
 
 	FVector BatToTargetVector = FVector::Zero();
 
 protected:
+	//Functions
 	virtual void BeginPlay() override;
+	virtual void SlowmoFrame();
+	virtual void ResetWorldTimeDilation();
+	virtual void ResetToBaseCamera();
+	virtual void FollowBall(bool active);
 
 	//Bools
 	bool bIsCalculatingThrowForce = false;
@@ -84,8 +101,12 @@ protected:
 
 	//Properties
 	APlayerController* PlayerController;
+	FTimerHandle SlowmoTimer;
+	FTimerHandle HitCameraTimer;
 
 	//These time properties are used to change the ThrowForceBar and SwingForceBar
 	float ThrowForceBarRunningTime = 0.f;
 	float SwingForceBarRunningTime = 0.f;
+
+
 };

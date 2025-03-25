@@ -11,6 +11,7 @@
 #include "HUD/HUDWidget.h"
 #include "HUD/ThrowForceBar.h"
 #include "Balls/Ball.h"
+#include "Camera/CameraComponent.h"
 
 AGameplayManager::AGameplayManager()
 {
@@ -20,11 +21,14 @@ AGameplayManager::AGameplayManager()
 
 	UWorld* TheWorld = GetWorld();
 
+	BaseCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Base Camera"));
+	HitCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Hit Camera"));
 }
 
 void AGameplayManager::BeginPlay()
 {
 	Super::BeginPlay(); 
+	BaseCamera->SetActive(true);
 	PlayerController = Cast<APlayerController>(GetController());
 
 	if (PlayerController)
@@ -33,6 +37,35 @@ void AGameplayManager::BeginPlay()
 		{
 			Subsystem->AddMappingContext(GameplayMappingContext, 0);
 		}
+	}
+}
+
+void AGameplayManager::SlowmoFrame()
+{
+	GetWorldSettings()->SetTimeDilation(0.01f);
+	GetWorldTimerManager().SetTimer(SlowmoTimer, this, &AGameplayManager::ResetWorldTimeDilation, 0.003f);
+}
+
+void AGameplayManager::ResetWorldTimeDilation()
+{
+	GetWorldSettings()->SetTimeDilation(1.f);
+}
+
+void AGameplayManager::ResetToBaseCamera()
+{
+	HitCamera->SetActive(false);
+	BaseCamera->SetActive(true);
+}
+
+void AGameplayManager::FollowBall(bool active)
+{
+	if(active)
+	{
+		PlayerController->SetViewTarget(Ball);
+	}
+	else
+	{
+		PlayerController->SetViewTarget(this);
 	}
 }
 
@@ -60,12 +93,13 @@ void AGameplayManager::Tick(float DeltaTime)
 }
 
 void AGameplayManager::MoveBat(const FInputActionValue& Value)
-{
+{	
 }
 
 void AGameplayManager::ThrowBall(const FInputActionValue& Value)
 {
 	Ball = thrower->ThrowBall();
+	Ball->SetGameplayManager(this);
 }
 
 void AGameplayManager::SwingBat(const FInputActionValue& Value)
@@ -73,6 +107,9 @@ void AGameplayManager::SwingBat(const FInputActionValue& Value)
 	if(Ball)
 	{
 		batter->SwingBat(BatToTargetVector, Ball);
+		SlowmoFrame();
+		//GetWorldTimerManager().ClearTimer(SlowmoTimer);
+		FollowBall(true);
 	}
 }
 
@@ -125,6 +162,11 @@ void AGameplayManager::ConfirmTarget(const FInputActionValue&)
 	BatToTargetVector = FVector(TargetVector.X - BatVector.X, TargetVector.Y - BatVector.Y, TargetVector.Z - BatVector.Z);
 }
 
+void AGameplayManager::ResetTarget(const FInputActionValue&)
+{
+	bTargetIsLocked = false;
+}
+
 void AGameplayManager::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -138,7 +180,18 @@ void AGameplayManager::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(DetermineSwingForceAction, ETriggerEvent::Triggered, this, &AGameplayManager::DetermineSwingForce);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AGameplayManager::TakeAim);
 		EnhancedInputComponent->BindAction(ConfirmTargetAction, ETriggerEvent::Triggered, this, &AGameplayManager::ConfirmTarget);
+		EnhancedInputComponent->BindAction(ResetTargetAction, ETriggerEvent::Triggered, this, &AGameplayManager::ResetTarget);
 		
 	}
+}
+
+void AGameplayManager::BallHitTarget()
+{
+	SlowmoFrame();
+	FollowBall(false);
+	HitCamera->SetRelativeTransform(Ball->FollowCamera->GetComponentTransform());
+	BaseCamera->SetActive(false);
+	HitCamera->SetActive(true);
+	GetWorldTimerManager().SetTimer(HitCameraTimer, this, &AGameplayManager::ResetToBaseCamera, 2.f);
 }
 

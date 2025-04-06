@@ -2,13 +2,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/Pawn.h"
 #include "Batter.generated.h"
 
 class ABall;
 class UAnimInstance;
 UCLASS()
-class BASEBALL_API ABatter : public AActor
+class BASEBALL_API ABatter : public APawn
 {
 	GENERATED_BODY()
 	
@@ -23,7 +23,8 @@ public:
 	USkeletalMeshComponent* mesh;
 
 	//Functions
-	void SwingBat(FVector BatToTargetVector, ABall* ball);
+	void SwingBat(FVector BatToTargetVector, ABall* ball = nullptr);
+	void MoveBat(FVector MovementVector);
 
 	UPROPERTY(VisibleAnywhere)
 	float SwingForce;
@@ -43,9 +44,12 @@ protected:
 
 	UAnimInstance* AnimInstance;
 
-	//Functions
-	void CreateFields();
 
+	//Variables
+	float LocationYMax;
+	float LocationYMin;
+	float LocationZMax;
+	float LocationZMin;
 
 
 };

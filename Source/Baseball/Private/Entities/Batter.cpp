@@ -2,6 +2,7 @@
 #include "Entities/Batter.h"
 #include "FieldSystems/BatterFieldSystem.h"
 #include "Animation/AnimMontage.h"
+#include "Math/UnrealMathUtility.h"
 #include "Balls/Ball.h"
 
 ABatter::ABatter()
@@ -15,9 +16,21 @@ ABatter::ABatter()
 void ABatter::SwingBat(FVector BatToTargetVector, ABall* ball)
 {
 	PlayMontage();
-	ball->mesh->AddImpulse(BatToTargetVector*(SwingForce*2), NAME_None, true);
+	if(ball)
+	{
+		ball->mesh->AddImpulse(BatToTargetVector*(SwingForce*2), NAME_None, true);
+	}
+}
 
-	//CreateFields();
+void ABatter::MoveBat(FVector MovementVector)
+{
+	FVector NewLocation = GetActorLocation() + MovementVector;
+	
+	//Limiting the batter to it's boundaries
+	NewLocation.Y = FMath::Clamp(NewLocation.Y, LocationYMin, LocationYMax);
+	NewLocation.Z = FMath::Clamp(NewLocation.Z, LocationZMin, LocationZMax);
+
+	SetActorLocation(NewLocation);
 }
 
 void ABatter::BeginPlay()
@@ -25,6 +38,12 @@ void ABatter::BeginPlay()
 	Super::BeginPlay();
 	
 	AnimInstance = mesh->GetAnimInstance();
+
+	//Setting Location Boundaries
+	LocationYMax = GetActorLocation().Y + 700.f;
+	LocationYMin = GetActorLocation().Y - 700.f;
+	LocationZMax = GetActorLocation().Z + 500.f;
+	LocationZMin = GetActorLocation().Z - 50.f;
 }
 
 void ABatter::Tick(float DeltaTime)
@@ -40,15 +59,6 @@ void ABatter::PlayMontage()
 		AnimInstance->Montage_Play(Montage);
 		AnimInstance->Montage_JumpToSection(FName("Swing"), Montage);
 	}
-
-	UE_LOG(LogExec, Warning, TEXT("PlayMontage() was called."));
-}
-
-void ABatter::CreateFields()
-{
-	FVector Location = GetActorLocation() + (GetActorForwardVector() * 20.f);
-	ABatterFieldSystem* Fields = GetWorld()->SpawnActor<ABatterFieldSystem>(BatterFieldSystemClass, Location, GetActorRotation());
-	Fields->Force = SwingForce;
 }
 
 

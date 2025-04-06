@@ -94,6 +94,13 @@ void AGameplayManager::Tick(float DeltaTime)
 
 void AGameplayManager::MoveBat(const FInputActionValue& Value)
 {	
+	if(bTargetIsLocked)
+	{
+		FVector2D MovementVector = Value.Get<FVector2D>();
+		FVector MovementVector3D = FVector(0,MovementVector.X*5, MovementVector.Y*5);
+
+		batter->MoveBat(MovementVector3D);
+	}
 }
 
 void AGameplayManager::ThrowBall(const FInputActionValue& Value)
@@ -104,13 +111,10 @@ void AGameplayManager::ThrowBall(const FInputActionValue& Value)
 
 void AGameplayManager::SwingBat(const FInputActionValue& Value)
 {
-	if(Ball)
-	{
-		batter->SwingBat(BatToTargetVector, Ball);
-		SlowmoFrame();
-		//GetWorldTimerManager().ClearTimer(SlowmoTimer);
-		//FollowBall(true);
-	}
+	batter->SwingBat(BatToTargetVector, Ball);
+	SlowmoFrame();
+	//GetWorldTimerManager().ClearTimer(SlowmoTimer);
+	//FollowBall(true);
 }
 
 void AGameplayManager::DetermineThrowForce(const FInputActionValue& Value)

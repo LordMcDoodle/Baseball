@@ -109,7 +109,7 @@ void AGameplayManager::SwingBat(const FInputActionValue& Value)
 		batter->SwingBat(BatToTargetVector, Ball);
 		SlowmoFrame();
 		//GetWorldTimerManager().ClearTimer(SlowmoTimer);
-		FollowBall(true);
+		//FollowBall(true);
 	}
 }
 

@@ -6,7 +6,7 @@
 #include "Batter.generated.h"
 
 class ABall;
-
+class UAnimInstance;
 UCLASS()
 class BASEBALL_API ABatter : public AActor
 {
@@ -18,12 +18,16 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	//Components
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* mesh;
+
 	//Functions
 	void SwingBat(FVector BatToTargetVector, ABall* ball);
 
 	UPROPERTY(VisibleAnywhere)
 	float SwingForce;
-
+	void PlayMontage();
 protected:
 
 	//Inherited
@@ -32,6 +36,12 @@ protected:
 	//Components
 	UPROPERTY(EditAnywhere)
 	UClass* BatterFieldSystemClass;
+
+	//Montages
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* Montage;
+
+	UAnimInstance* AnimInstance;
 
 	//Functions
 	void CreateFields();

@@ -7,6 +7,9 @@
 
 class ABall;
 class UAnimInstance;
+class UBoxComponent;
+class ABat;
+
 UCLASS()
 class BASEBALL_API ABatter : public APawn
 {
@@ -25,10 +28,13 @@ public:
 	//Functions
 	void SwingBat(FVector BatToTargetVector, ABall* ball = nullptr);
 	void MoveBat(FVector MovementVector);
+	void PlayMontage();
 
 	UPROPERTY(VisibleAnywhere)
 	float SwingForce;
-	void PlayMontage();
+
+
+
 protected:
 
 	//Inherited
@@ -37,13 +43,14 @@ protected:
 	//Components
 	UPROPERTY(EditAnywhere)
 	UClass* BatterFieldSystemClass;
+	UPROPERTY(EditAnywhere)
+	ABat* bat;
 
 	//Montages
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	UAnimMontage* Montage;
 
 	UAnimInstance* AnimInstance;
-
 
 	//Variables
 	float LocationYMax;

@@ -5,6 +5,8 @@
 #include "Math/UnrealMathUtility.h"
 #include "Bats/Bat.h"
 #include "Balls/Ball.h"
+#include "Managers/GameplayManager.h"
+		
 
 ABatter::ABatter()
 {
@@ -14,13 +16,9 @@ ABatter::ABatter()
 	SetRootComponent(mesh);
 }
 
-void ABatter::SwingBat(FVector BatToTargetVector, ABall* ball)
+void ABatter::SwingBat()
 {
 	PlayMontage();
-	if(ball)
-	{
-		ball->mesh->AddImpulse(BatToTargetVector*(SwingForce*2), NAME_None, true);
-	}
 }
 
 void ABatter::MoveBat(FVector MovementVector)
@@ -38,6 +36,25 @@ void ABatter::BeginPlay()
 	{
 		bat->Equip(mesh, FName("BatSocket"), this, this);
 	}
+}
+
+void ABatter::HitBall(ABall* ball)
+{
+	if(TargetToHit)
+	{
+		FVector TargetVector = TargetToHit->GetActorLocation();
+		FVector BatVector = GetActorLocation();
+
+		FVector BatToTargetVector = FVector(TargetVector.X - BatVector.X, TargetVector.Y - BatVector.Y, TargetVector.Z - BatVector.Z);
+
+		ball->mesh->AddImpulse(BatToTargetVector * (SwingForce*0.5f), NAME_None, true);
+	}
+
+	if(ball && !ball->BallHasBeenSent)
+	{
+		GM->BallIsHit(ball);
+	}
+	
 }
 
 void ABatter::Tick(float DeltaTime)

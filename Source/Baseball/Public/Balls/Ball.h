@@ -25,6 +25,7 @@ public:
 	USpringArmComponent* SpringArm;
 
 	bool BallAlreadyHitTarget = false;
+	bool BallHasBeenSent = false;
 
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION()

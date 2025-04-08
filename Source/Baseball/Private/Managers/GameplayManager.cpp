@@ -23,11 +23,27 @@ AGameplayManager::AGameplayManager()
 
 	BaseCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Base Camera"));
 	HitCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Hit Camera"));
+
 }
 
 void AGameplayManager::BeginPlay()
 {
 	Super::BeginPlay(); 
+
+
+	if(Ball)
+	{
+		Ball->SetGameplayManager(this);
+	}
+	if(batter)
+	{
+		batter->SetGameplayManager(this);
+	}
+	if(thrower)
+	{
+		thrower->SetGameplayManager(this);
+	}
+
 	BaseCamera->SetActive(true);
 	PlayerController = Cast<APlayerController>(GetController());
 
@@ -43,12 +59,13 @@ void AGameplayManager::BeginPlay()
 void AGameplayManager::SlowmoFrame()
 {
 	GetWorldSettings()->SetTimeDilation(0.01f);
-	GetWorldTimerManager().SetTimer(SlowmoTimer, this, &AGameplayManager::ResetWorldTimeDilation, 0.003f);
+	GetWorldTimerManager().SetTimer(SlowmoTimer, this, &AGameplayManager::ResetWorldTimeDilation, 0.004f);
 }
 
 void AGameplayManager::ResetWorldTimeDilation()
 {
 	GetWorldSettings()->SetTimeDilation(1.f);
+	GetWorldTimerManager().ClearTimer(SlowmoTimer);
 }
 
 void AGameplayManager::ResetToBaseCamera()
@@ -57,16 +74,23 @@ void AGameplayManager::ResetToBaseCamera()
 	BaseCamera->SetActive(true);
 }
 
-void AGameplayManager::FollowBall(bool active)
+void AGameplayManager::FollowBall(bool active, ABall* ball)
 {
 	if(active)
 	{
-		PlayerController->SetViewTarget(Ball);
+		PlayerController->SetViewTarget(ball);
 	}
 	else
 	{
 		PlayerController->SetViewTarget(this);
 	}
+}
+
+void AGameplayManager::BallIsHit(ABall* ball)
+{
+	UE_LOG(LogTemp, Warning, TEXT("HIT"));
+	SlowmoFrame();
+	FollowBall(true,ball);
 }
 
 void AGameplayManager::Tick(float DeltaTime)
@@ -106,15 +130,11 @@ void AGameplayManager::MoveBat(const FInputActionValue& Value)
 void AGameplayManager::ThrowBall(const FInputActionValue& Value)
 {
 	Ball = thrower->ThrowBall();
-	Ball->SetGameplayManager(this);
 }
 
 void AGameplayManager::SwingBat(const FInputActionValue& Value)
 {
-	batter->SwingBat(BatToTargetVector, Ball);
-	SlowmoFrame();
-	//GetWorldTimerManager().ClearTimer(SlowmoTimer);
-	//FollowBall(true);
+	batter->SwingBat();
 }
 
 void AGameplayManager::DetermineThrowForce(const FInputActionValue& Value)
@@ -152,23 +172,19 @@ void AGameplayManager::TakeAim(const FInputActionValue&)
 		{
 			TargetWidget->SetActorLocation(Hit.Location);
 		}
-
 	}
 }
 
 void AGameplayManager::ConfirmTarget(const FInputActionValue&)
 {
 	bTargetIsLocked = true;
-
-	FVector TargetVector = TargetWidget->GetActorLocation();
-	FVector BatVector = batter->GetActorLocation();
-
-	BatToTargetVector = FVector(TargetVector.X - BatVector.X, TargetVector.Y - BatVector.Y, TargetVector.Z - BatVector.Z);
+	batter->TargetToHit = TargetWidget;
 }
 
 void AGameplayManager::ResetTarget(const FInputActionValue&)
 {
 	bTargetIsLocked = false;
+	batter->TargetToHit = nullptr;
 }
 
 void AGameplayManager::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

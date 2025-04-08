@@ -3,6 +3,9 @@
 
 #include "Bats/Bat.h"
 #include "Components/BoxComponent.h"
+#include "Balls/Ball.h"
+#include "Entities/Batter.h"
+#include <Kismet/KismetSystemLibrary.h>
 
 // Sets default values
 ABat::ABat()
@@ -11,14 +14,12 @@ ABat::ABat()
 	PrimaryActorTick.bCanEverTick = true;
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Bat Mesh"));
-	SetRootComponent(mesh);
+	mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	RootComponent = mesh;
 
 	//HitBoxes and Traces
 	SweetSpotBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Sweet Spot Box"));
 	SweetSpotBox->SetupAttachment(GetRootComponent());
-	SweetSpotBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SweetSpotBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-	SweetSpotBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	SweetSpotTraceStart = CreateDefaultSubobject<USceneComponent>(TEXT("Sweet Spot Trace Start"));
 	SweetSpotTraceStart->SetupAttachment(GetRootComponent());
 	SweetSpotTraceEnd = CreateDefaultSubobject<USceneComponent>(TEXT("Sweet Spot Trace End"));
@@ -26,9 +27,6 @@ ABat::ABat()
 
 	WonkyBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Wonky Box"));
 	WonkyBox->SetupAttachment(GetRootComponent());
-	WonkyBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	WonkyBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-	WonkyBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	WonkyBoxTraceStart = CreateDefaultSubobject<USceneComponent>(TEXT("Wonky Trace Start"));
 	WonkyBoxTraceStart->SetupAttachment(GetRootComponent());
 	WonkyBoxTraceEnd = CreateDefaultSubobject<USceneComponent>(TEXT("Wonky Trace End"));
@@ -36,13 +34,14 @@ ABat::ABat()
 
 	SlowBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Slow Box"));
 	SlowBox->SetupAttachment(GetRootComponent());
-	SlowBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SlowBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-	SlowBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	SlowBoxTraceStart = CreateDefaultSubobject<USceneComponent>(TEXT("Slow Trace Start"));
 	SlowBoxTraceStart->SetupAttachment(GetRootComponent());
 	SlowBoxTraceEnd = CreateDefaultSubobject<USceneComponent>(TEXT("Slow Trace End"));
 	SlowBoxTraceEnd->SetupAttachment(GetRootComponent());
+
+	SweetSpotBox->OnComponentHit.AddDynamic(this, &ABat::OnHit);
+	SlowBox->OnComponentHit.AddDynamic(this, &ABat::OnHit);
+	WonkyBox->OnComponentHit.AddDynamic(this, &ABat::OnHit);
 
 }
 
@@ -50,8 +49,20 @@ ABat::ABat()
 void ABat::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
+
+void ABat::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if(ABall* ball = Cast<ABall>(OtherActor))
+	{
+		if(ABatter* batter = Cast<ABatter>(Owner))
+		{
+			batter->HitBall(ball);
+			ball->BallHasBeenSent = true;
+		}
+	}
+}
+
 
 // Called every frame
 void ABat::Tick(float DeltaTime)

@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Managers/GameplayManager.h"
+#include "Bats/Bat.h"
 
 ABall::ABall()
 {
@@ -37,10 +38,10 @@ void ABall::Tick(float DeltaTime)
 
 void ABall::OnComponentHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if(GM && !BallAlreadyHitTarget && OtherActor != this)
+	if(GM && !BallAlreadyHitTarget && BallHasBeenSent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Actor's name is %s"), *OtherActor->GetName());
-		
+		if (Cast<ABat>(OtherActor)) return;
+
 		GM->BallHitTarget();
 		BallAlreadyHitTarget = true;
 	}

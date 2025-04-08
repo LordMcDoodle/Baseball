@@ -9,6 +9,7 @@ class ABall;
 class UAnimInstance;
 class UBoxComponent;
 class ABat;
+class AGameplayManager;
 
 UCLASS()
 class BASEBALL_API ABatter : public APawn
@@ -26,14 +27,20 @@ public:
 	USkeletalMeshComponent* mesh;
 
 	//Functions
-	void SwingBat(FVector BatToTargetVector, ABall* ball = nullptr);
+	void SwingBat();
 	void MoveBat(FVector MovementVector);
 	void PlayMontage();
+	void HitBall(ABall* ball);
+
 
 	UPROPERTY(VisibleAnywhere)
 	float SwingForce;
 
+	AActor* TargetToHit = nullptr;
 
+	//Getter and Setter
+	void SetGameplayManager(AGameplayManager* value) { GM = value; }
+	AGameplayManager* SetGameplayManager() { return GM; }
 
 protected:
 
@@ -45,6 +52,9 @@ protected:
 	UClass* BatterFieldSystemClass;
 	UPROPERTY(EditAnywhere)
 	ABat* bat;
+	UPROPERTY(VisibleAnywhere)
+	AGameplayManager* GM;
+
 
 	//Montages
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
@@ -57,6 +67,5 @@ protected:
 	float LocationYMin;
 	float LocationZMax;
 	float LocationZMin;
-
 
 };

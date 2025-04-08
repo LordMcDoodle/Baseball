@@ -31,7 +31,9 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	virtual void BallHitTarget();
+	void BallHitTarget();
+
+	void BallIsHit(ABall* ball);
 
 
 	//Entities
@@ -41,7 +43,7 @@ public:
 	AThrower* thrower;
 	UPROPERTY(EditAnywhere, Category = Entities)
 	ATargetWidget* TargetWidget;
-	UPROPERTY()
+	UPROPERTY(EditInstanceOnly)
 	ABall* Ball = nullptr;
 
 	//Input Mapping Contexts
@@ -89,10 +91,10 @@ public:
 protected:
 	//Functions
 	virtual void BeginPlay() override;
-	virtual void SlowmoFrame();
-	virtual void ResetWorldTimeDilation();
-	virtual void ResetToBaseCamera();
-	virtual void FollowBall(bool active);
+	virtual	void SlowmoFrame();
+	virtual	void ResetWorldTimeDilation();
+	virtual	void ResetToBaseCamera();
+	void FollowBall(bool active,ABall* ball = nullptr);
 
 	//Bools
 	bool bIsCalculatingThrowForce = false;

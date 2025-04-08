@@ -5,6 +5,7 @@
 #include "Thrower.generated.h"
 
 class ABall;
+class AGameplayManager;
 
 UCLASS()
 class BASEBALL_API AThrower : public AActor
@@ -20,8 +21,12 @@ public:
 	//Properties
 	float ThrowForce;
 
-
 	ABall* ThrowBall();
+
+	//Getter and Setter
+	void SetGameplayManager(AGameplayManager* value) { GM = value; }
+	AGameplayManager* SetGameplayManager() { return GM; }
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -34,6 +39,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* mesh;
+
+	UPROPERTY(VisibleAnywhere)
+	AGameplayManager* GM;
 
 	/*
 	Functions

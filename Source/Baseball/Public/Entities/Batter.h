@@ -2,13 +2,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/Pawn.h"
 #include "Batter.generated.h"
 
 class ABall;
+class UAnimInstance;
+class UBoxComponent;
+class ABat;
+class AGameplayManager;
 
 UCLASS()
-class BASEBALL_API ABatter : public AActor
+class BASEBALL_API ABatter : public APawn
 {
 	GENERATED_BODY()
 	
@@ -18,11 +22,25 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	//Components
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* mesh;
+
 	//Functions
-	void SwingBat(FVector BatToTargetVector, ABall* ball);
+	void SwingBat();
+	void MoveBat(FVector MovementVector);
+	void PlayMontage();
+	void HitBall(ABall* ball);
+
 
 	UPROPERTY(VisibleAnywhere)
 	float SwingForce;
+
+	AActor* TargetToHit = nullptr;
+
+	//Getter and Setter
+	void SetGameplayManager(AGameplayManager* value) { GM = value; }
+	AGameplayManager* SetGameplayManager() { return GM; }
 
 protected:
 
@@ -32,10 +50,22 @@ protected:
 	//Components
 	UPROPERTY(EditAnywhere)
 	UClass* BatterFieldSystemClass;
+	UPROPERTY(EditAnywhere)
+	ABat* bat;
+	UPROPERTY(VisibleAnywhere)
+	AGameplayManager* GM;
 
-	//Functions
-	void CreateFields();
 
+	//Montages
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* Montage;
 
+	UAnimInstance* AnimInstance;
+
+	//Variables
+	float LocationYMax;
+	float LocationYMin;
+	float LocationZMax;
+	float LocationZMin;
 
 };

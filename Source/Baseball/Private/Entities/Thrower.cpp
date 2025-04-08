@@ -3,6 +3,7 @@
 #include "Balls/Ball.h"
 #include "FieldSystems/ThrowerFieldSystem.h"
 #include "Balls/Ball.h"
+#include "Managers/GameplayManager.h"
 
 AThrower::AThrower()
 {

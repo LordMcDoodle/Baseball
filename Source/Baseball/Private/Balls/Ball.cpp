@@ -38,12 +38,43 @@ void ABall::Tick(float DeltaTime)
 
 void ABall::OnComponentHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Hit by %s"), *OtherActor->GetName());
+
 	if(GM && !BallAlreadyHitTarget && BallHasBeenSent)
 	{
+
 		if (Cast<ABat>(OtherActor)) return;
 
 		GM->BallHitTarget();
 		BallAlreadyHitTarget = true;
 	}
+}
+
+void ABall::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner)
+{
+	SetOwner(NewOwner);
+
+	AttachMeshToSocket(InParent, InSocketName);
+}
+
+void ABall::Unequip()
+{
+	SetOwner(nullptr);
+
+	DetachMeshFromSocket();
+}
+
+void ABall::AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName)
+{
+	mesh->SetSimulatePhysics(false);
+	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
+	mesh->AttachToComponent(InParent, TransformRules, InSocketName);
+
+}
+
+void ABall::DetachMeshFromSocket()
+{
+	FDetachmentTransformRules TransformRules(FDetachmentTransformRules::KeepWorldTransform);
+	mesh->DetachFromComponent(TransformRules);
 }
 

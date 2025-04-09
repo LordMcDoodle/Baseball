@@ -14,14 +14,18 @@ class BASEBALL_API AThrower : public AActor
 	
 public:	
 	AThrower();
-
 	virtual void Tick(float DeltaTime) override;
+
+	void PlayMontage();
+
+	void Pitch();
 
 	UPROPERTY(VisibleAnywhere)
 	//Properties
 	float ThrowForce;
 
-	ABall* ThrowBall();
+	UPROPERTY(EditInstanceOnly)
+	ABall* BallInHand;
 
 	//Getter and Setter
 	void SetGameplayManager(AGameplayManager* value) { GM = value; }
@@ -29,7 +33,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
+	UFUNCTION(BlueprintCallable)
+	void ThrowBall();
+
 	/*
 	Components
 	*/
@@ -38,22 +44,18 @@ protected:
 	UClass* ThrowerFieldSystemClass;
 
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* mesh;
+	USkeletalMeshComponent* mesh;
 
 	UPROPERTY(VisibleAnywhere)
 	AGameplayManager* GM;
 
-	/*
-	Functions
-	*/
+	UPROPERTY(EditInstanceOnly)
+	AActor* ThrowTarget;
 
-	void CreateField();
+	//Montages
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* Montage;
 
-	/*
-	Temporary
-	*/
+	UAnimInstance* AnimInstance;
 
-	UPROPERTY(EditAnywhere)
-	UClass* BallClass;
-	FTimerHandle ThrowTimer;
 };

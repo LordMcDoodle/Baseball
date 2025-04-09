@@ -9,13 +9,20 @@ AThrower::AThrower()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Thrower Mesh"));
+	mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Thrower Mesh"));
 	SetRootComponent(mesh);
 }
 
 void AThrower::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AnimInstance = mesh->GetAnimInstance();
+
+	if (BallInHand)
+	{
+		BallInHand->Equip(mesh, FName("BallSocket"), this);
+	}
 }
 
 
@@ -24,25 +31,35 @@ void AThrower::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-ABall* AThrower::ThrowBall()
+void AThrower::PlayMontage()
 {
-	FVector Location = GetActorLocation() + (GetActorForwardVector() * 50.f);
-	ABall* Ball = GetWorld()->SpawnActor<ABall>(BallClass, Location, GetActorRotation());
-
-	Ball->mesh->AddImpulse(FVector(-(ThrowForce*1000),0,0),NAME_None,true);
-
-	return Ball;
-	//CreateField();
+	if (AnimInstance && Montage)
+	{
+		AnimInstance->Montage_Play(Montage);
+		AnimInstance->Montage_JumpToSection(FName("Throw"), Montage);
+	}
 }
 
-void AThrower::CreateField()
+void AThrower::Pitch()
 {
-	FVector Location = GetActorLocation() + (GetActorForwardVector() * 20.f);
-	AThrowerFieldSystem* Field = GetWorld()->SpawnActorDeferred<AThrowerFieldSystem>(AThrowerFieldSystem::StaticClass(), GetTransform());
-	Field->Force = ThrowForce;
-	Field->FinishSpawning(GetTransform());
+	PlayMontage();
+}
 
-	Field->CreateForce();
+void AThrower::ThrowBall()
+{
+	BallInHand->Unequip();
+	BallInHand->mesh->SetSimulatePhysics(true);
+
+	if(ThrowTarget)
+	{
+		FVector TargetVector = ThrowTarget->GetActorLocation();
+		FVector BallVector = BallInHand->GetActorLocation();
+
+		FVector BallToTargetVector = FVector(TargetVector.X - BallVector.X, TargetVector.Y - BallVector.Y, TargetVector.Z - BallVector.Z);
+
+		BallInHand->mesh->AddImpulse(BallToTargetVector * (ThrowForce * 3.0f), NAME_None, true);
+	}
+
 }
 
 

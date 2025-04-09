@@ -31,6 +31,12 @@ public:
 	UFUNCTION()
 	void OnComponentHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	void Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner);
+	void Unequip();
+
+	void AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName);
+	void DetachMeshFromSocket();
+
 	//Getter/Setters
 	void SetGameplayManager(AGameplayManager* value) { GM = value; }
 

@@ -129,7 +129,7 @@ void AGameplayManager::MoveBat(const FInputActionValue& Value)
 
 void AGameplayManager::ThrowBall(const FInputActionValue& Value)
 {
-	Ball = thrower->ThrowBall();
+	thrower->Pitch();
 }
 
 void AGameplayManager::SwingBat(const FInputActionValue& Value)

@@ -47,18 +47,42 @@ void AThrower::Pitch()
 
 void AThrower::ThrowBall()
 {
-	BallInHand->Unequip();
-	BallInHand->mesh->SetSimulatePhysics(true);
 
-	if(ThrowTarget)
+	BallInHand->Unequip();
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AThrower::ApplyImpulse, 0.01f, false);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Ball Location is : %s"), *BallInHand->GetActorLocation().ToString());
+
+}
+
+void AThrower::SpawnNewBall()
+{
+	BallInHand = GetWorld()->SpawnActor<ABall>(BallClass, GetActorLocation(), GetActorRotation());
+	BallInHand->Equip(mesh, FName("BallSocket"), this);
+}
+
+void AThrower::ApplyImpulse()
+{
+	if (ThrowTarget)
 	{
 		FVector TargetVector = ThrowTarget->GetActorLocation();
-		FVector BallVector = BallInHand->GetActorLocation();
+		FVector BallVector = BallInHand->mesh->GetComponentLocation();
 
 		FVector BallToTargetVector = FVector(TargetVector.X - BallVector.X, TargetVector.Y - BallVector.Y, TargetVector.Z - BallVector.Z);
 
-		BallInHand->mesh->AddImpulse(BallToTargetVector * (ThrowForce * 3.0f), NAME_None, true);
+		//BallToTargetVector = FVector(BallToTargetVector.X * (ThrowForce * 3.f), BallToTargetVector.Y, BallToTargetVector.Z);
+
+		BallInHand->mesh->SetEnableGravity(false);
+		BallInHand->mesh->SetSimulatePhysics(true);
+		BallInHand->mesh->AddVelocityChangeImpulseAtLocation(BallToTargetVector * (ThrowForce * 3.0f), BallInHand->GetActorLocation());
+		//BallInHand->mesh->AddImpulse(BallToTargetVector*ThrowForce*3.f, NAME_None, true);
+		//BallInHand->mesh->AddImpulseAtLocation(BallToTargetVector * ThrowForce * 3.f, BallVector, NAME_None);
+
+		UE_LOG(LogTemp, Warning, TEXT("BallToTargetVector is : %s"), *BallToTargetVector.ToString());
 	}
+
+	SpawnNewBall();
 
 }
 

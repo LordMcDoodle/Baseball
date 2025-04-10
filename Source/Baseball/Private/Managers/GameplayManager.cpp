@@ -29,6 +29,7 @@ AGameplayManager::AGameplayManager()
 void AGameplayManager::BeginPlay()
 {
 	Super::BeginPlay(); 
+	//GetWorldSettings()->SetTimeDilation(0.2f);
 
 
 	if(Ball)

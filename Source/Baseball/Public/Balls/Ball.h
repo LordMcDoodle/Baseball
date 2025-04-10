@@ -37,6 +37,11 @@ public:
 	void AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName);
 	void DetachMeshFromSocket();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void LockZAxis();
+	UFUNCTION(BlueprintImplementableEvent)
+	void UnlockZAxis();
+
 	//Getter/Setters
 	void SetGameplayManager(AGameplayManager* value) { GM = value; }
 

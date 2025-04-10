@@ -57,6 +57,7 @@ void ABat::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimiti
 	{
 		if(ABatter* batter = Cast<ABatter>(Owner))
 		{
+			ball->mesh->SetEnableGravity(true);
 			batter->HitBall(ball);
 			ball->BallHasBeenSent = true;
 		}

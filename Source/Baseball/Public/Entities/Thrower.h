@@ -36,6 +36,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ThrowBall();
 
+
 	/*
 	Components
 	*/
@@ -43,7 +44,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UClass* ThrowerFieldSystemClass;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USkeletalMeshComponent* mesh;
 
 	UPROPERTY(VisibleAnywhere)
@@ -57,5 +58,14 @@ protected:
 	UAnimMontage* Montage;
 
 	UAnimInstance* AnimInstance;
+
+	//Temporary
+
+	void SpawnNewBall();
+	UPROPERTY(EditAnywhere)
+	UClass* BallClass;
+
+	UFUNCTION()
+	void ApplyImpulse();
 
 };

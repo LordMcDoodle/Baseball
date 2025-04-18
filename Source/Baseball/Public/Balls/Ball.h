@@ -9,6 +9,7 @@ class UCapsuleComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class AGameplayManager;
+class ABallShadow;
 
 UCLASS()
 class BASEBALL_API ABall : public AActor
@@ -37,11 +38,6 @@ public:
 	void AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName);
 	void DetachMeshFromSocket();
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void LockZAxis();
-	UFUNCTION(BlueprintImplementableEvent)
-	void UnlockZAxis();
-
 	//Getter/Setters
 	void SetGameplayManager(AGameplayManager* value) { GM = value; }
 
@@ -50,7 +46,15 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void CreateShadow();
+	virtual void UpdateShadowLocation();
+
 	UPROPERTY()
 	AGameplayManager* GM = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	UClass* ShadowClass;
+
+	ABallShadow* Shadow;
 
 };
